@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261031_02">
   <script>document.documentElement.classList.add('js');</script>
 </head>
 
@@ -61,13 +61,14 @@
 
         <!-- Left: copy -->
         <div class="hero__copy">
-          <h1 class="hero__title" data-i="0" style="--i:0">Hi, I'm <span class="accent">Aditya</span></h1>
-          <p class="hero__role" data-i="1" style="--i:1"><span id="typewriter">Fullstack Developer</span><span
+          <span class="hero__badge eyebrow" data-i="0" style="--i:0">WELCOME TO MY PORTFOLIO</span>
+          <h1 class="hero__title" data-i="1" style="--i:1">Hi, I'm <span class="accent">Aditya</span></h1>
+          <p class="hero__role" data-i="2" style="--i:2"><span id="typewriter">Fullstack Developer</span><span
               class="hero__cursor">|</span></p>
-          <p class="hero__desc" data-i="2" style="--i:2">Crafting modern, responsive, and user-friendly web applications
+          <p class="hero__desc" data-i="3" style="--i:3">Crafting modern, responsive, and user-friendly web applications
             with attention to detail, performance, and clean code. Passionate about building digital experiences that
             make a difference.</p>
-          <div class="hero__actions" data-i="3" style="--i:3">
+          <div class="hero__actions" data-i="4" style="--i:4">
             <a class="btn btn--solid" href="#projects">
               Explore Work
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -77,7 +78,7 @@
             </a>
             <a class="btn btn--ghost" href="#contact">Contact Me</a>
           </div>
-          <div class="hero__connect" data-i="4" style="--i:4">
+          <div class="hero__connect" data-i="5" style="--i:5">
             <span class="hero__connect-label">CONNECT</span>
             <div class="hero__socials">
               <a class="icon-btn" href="https://www.instagram.com/md.adityaa__" target="_blank" rel="noreferrer"
@@ -616,7 +617,7 @@
       <div class="container">
         <div class="sec-head reveal">
           <span class="eyebrow">COURSEWORK &middot; UNIVERSITAS AHMAD DAHLAN</span>
-          <h2 class="h2">Professional English Class</h2>
+          <h2 class="h2">English Class</h2>
           <p class="sec-desc">Assignments and learning outcomes from my Professional English course, focusing on
             communication, academic writing, and professional English skills.</p>
         </div>
@@ -761,7 +762,7 @@
               </div>
               <div class="form-group">
                 <label class="form-label" for="cemail">EMAIL</label>
-                <input class="form-input" id="cemail" name="email" type="email" placeholder="johndoe@example.com"
+                <input class="form-input" id="cemail" name="email" type="email" placeholder="johndoe@gmail.com"
                   autocomplete="email" required>
                 <span class="form-err" id="cemailErr"></span>
               </div>
@@ -842,19 +843,31 @@
       /* ── JS activation ───────────────────────── */
       document.documentElement.classList.add('js');
 
-      /* ── Page Load Sequence (Immediate fluid entrance) ─────────────────── */
-      function initPageEntrance() {
-        document.body.classList.add('page-loaded');
-        var hv = document.querySelector('.hv');
-        if (hv) hv.classList.add('active');
+      /* ── Word-by-word Heading Preparation ────────────────────── */
+      function prepareHeadingWords() {
+        document.querySelectorAll('.sec-head .h2').forEach(function (h2) {
+          if (h2.dataset.split) return;
+          h2.dataset.split = 'true';
+          var text = h2.textContent.trim();
+          var words = text.split(/\s+/);
+          h2.innerHTML = words.map(function (w, idx) {
+            return '<span class="motion-word"><span class="motion-word__inner" style="--w-i:' + idx + '; transition-delay: calc(0.08s + ' + idx + ' * 0.08s);">' + w + '</span></span>';
+          }).join(' ');
+        });
+      }
+      prepareHeadingWords();
+
+      /* ── Hero Page Load Sequence ────────────────────────────── */
+      function initHeroEntrance() {
+        requestAnimationFrame(function () {
+          document.body.classList.add('page-loaded');
+        });
       }
 
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-          requestAnimationFrame(initPageEntrance);
-        });
+        document.addEventListener('DOMContentLoaded', initHeroEntrance);
       } else {
-        requestAnimationFrame(initPageEntrance);
+        initHeroEntrance();
       }
 
       /* ── Top Scroll Progress Bar (Framer Motion useScroll) ── */
@@ -873,27 +886,29 @@
       var yr = document.getElementById('yr');
       if (yr) yr.textContent = new Date().getFullYear();
 
-      /* ── Scroll Reveal IntersectionObserver (whileInView equivalent) ─── */
-      var observerTargets = document.querySelectorAll(
-        '.reveal, .reveal--left, .reveal--right'
-      );
-
-      var scrollIO = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) {
-          if (e.isIntersecting) {
-            e.target.classList.add('active');
-            e.target.classList.add('visible');
-            scrollIO.unobserve(e.target);
-          }
+      /* ── Scroll Reveal Observer (whileInView) ──────────── */
+      var revealTargets = document.querySelectorAll('.reveal, .reveal--left, .reveal--right, .sec-head');
+      if ('IntersectionObserver' in window) {
+        var scrollIO = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active', 'visible');
+              scrollIO.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.12,
+          rootMargin: '0px 0px -40px 0px'
         });
-      }, {
-        threshold: 0.08,
-        rootMargin: '0px 0px -20px 0px'
-      });
 
-      observerTargets.forEach(function (el) {
-        scrollIO.observe(el);
-      });
+        revealTargets.forEach(function (el) {
+          scrollIO.observe(el);
+        });
+      } else {
+        revealTargets.forEach(function (el) {
+          el.classList.add('active', 'visible');
+        });
+      }
 
       /* ── Navbar Scroll Header ───────────────── */
       var hdr = document.getElementById('header');

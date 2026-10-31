@@ -72,98 +72,231 @@ button{font-family:var(--font);cursor:pointer;border:none;background:none}
 }
 
 /* ═══════════════════════════════════════════════════
-   ANIMATION SYSTEM — Keyframe-Based Scroll Reveal
+   FRAMER MOTION SCROLL & ENTRANCE ANIMATION SYSTEM
+   Specification:
+   - Initial opacity: 0, translateY: 40px
+   - Final opacity: 1, translateY: 0
+   - Duration: 0.8s, smooth expo-out easing
+   - Sequential Hero entrance on page load
+   - Staggered cards and grouped items on scroll
    ═══════════════════════════════════════════════════ */
 
-/* Keyframes */
-@keyframes revealUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-@keyframes revealLeft{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:translateX(0)}}
-@keyframes revealRight{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-@keyframes chipReveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes dotPop{from{transform:scale(0)}to{transform:scale(1)}}
-@keyframes lineGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
-@keyframes heroIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+/* ═══════════════════════════════════════════════════
+   SCROLL REVEAL ANIMATIONS (Trigger on viewport entry)
+   Specification:
+   - Initial opacity: 0, translateY: 40px
+   - Final opacity: 1, translateY: 0
+   - Duration: 0.8s, smooth cubic-bezier(0.16, 1, 0.3, 1)
+   - Trigger when element enters viewport, runs once
+   ═══════════════════════════════════════════════════ */
 
-/* Base hidden states */
-.reveal,.reveal--left,.reveal--right{opacity:0}
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal--left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal--right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
 
-/* Active states — animation plays entrance, then normal CSS takes over for hover */
+/* Active states when in view */
 .reveal.active,
-.reveal.visible{opacity:1;transform:translateY(0);animation:revealUp 700ms var(--ease) backwards}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 .reveal--left.active,
-.reveal--left.visible{opacity:1;transform:translateX(0);animation:revealLeft 700ms var(--ease) backwards}
+.reveal--left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
 .reveal--right.active,
-.reveal--right.visible{opacity:1;transform:translateX(0);animation:revealRight 700ms var(--ease) backwards}
+.reveal--right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
 
-/* Stagger: Services */
-.svc-card.reveal.active:nth-child(2),.svc-card.reveal.visible:nth-child(2){animation-delay:100ms}
-.svc-card.reveal.active:nth-child(3),.svc-card.reveal.visible:nth-child(3){animation-delay:200ms}
+/* Word-by-word Heading Reveal */
+.motion-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: baseline;
+}
+.motion-word__inner {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(105%);
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+.sec-head.active .motion-word__inner,
+.sec-head.visible .motion-word__inner {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-/* Stagger: Projects */
-.proj-card.reveal.active:nth-child(2),.proj-card.reveal.visible:nth-child(2){animation-delay:80ms}
-.proj-card.reveal.active:nth-child(3),.proj-card.reveal.visible:nth-child(3){animation-delay:160ms}
-.proj-card.reveal.active:nth-child(4),.proj-card.reveal.visible:nth-child(4){animation-delay:80ms}
-.proj-card.reveal.active:nth-child(5),.proj-card.reveal.visible:nth-child(5){animation-delay:160ms}
+/* Stagger Delays for Grouped Cards */
+.services__grid .svc-card:nth-child(1) { transition-delay: 0.05s; }
+.services__grid .svc-card:nth-child(2) { transition-delay: 0.18s; }
+.services__grid .svc-card:nth-child(3) { transition-delay: 0.31s; }
 
-/* Stagger: Coursework */
-.course-card.reveal.active:nth-child(2),.course-card.reveal.visible:nth-child(2){animation-delay:80ms}
-.course-card.reveal.active:nth-child(3),.course-card.reveal.visible:nth-child(3){animation-delay:160ms}
-.course-card.reveal.active:nth-child(4),.course-card.reveal.visible:nth-child(4){animation-delay:80ms}
+.projects__grid .proj-card:nth-child(1) { transition-delay: 0.05s; }
+.projects__grid .proj-card:nth-child(2) { transition-delay: 0.15s; }
+.projects__grid .proj-card:nth-child(3) { transition-delay: 0.25s; }
+.projects__grid .proj-card:nth-child(4) { transition-delay: 0.15s; }
+.projects__grid .proj-card:nth-child(5) { transition-delay: 0.25s; }
 
-/* Stagger: Timeline items */
-.timeline__item.reveal.active:nth-child(3),.timeline__item.reveal.visible:nth-child(3){animation-delay:200ms}
+.coursework__grid .course-card:nth-child(1) { transition-delay: 0.05s; }
+.coursework__grid .course-card:nth-child(2) { transition-delay: 0.15s; }
+.coursework__grid .course-card:nth-child(3) { transition-delay: 0.25s; }
+.coursework__grid .course-card:nth-child(4) { transition-delay: 0.15s; }
 
-/* Timeline line grow */
-.timeline.reveal .timeline__line{transform-origin:top;transform:scaleY(0)}
-.timeline.reveal.active .timeline__line,
-.timeline.reveal.visible .timeline__line{transform:scaleY(1);animation:lineGrow 1000ms var(--ease) backwards 100ms}
+.timeline__item:nth-child(2) { transition-delay: 0.05s; }
+.timeline__item:nth-child(3) { transition-delay: 0.20s; }
+
+/* Timeline line grow on scroll */
+.timeline__line {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-b));
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top;
+  border-radius: 2px;
+  opacity: 0.35;
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+.timeline.active .timeline__line,
+.timeline.visible .timeline__line {
+  transform: translateX(-50%) scaleY(1);
+}
 
 /* Timeline dot pop */
-.timeline__item.reveal .timeline__dot{transform:scale(0)}
-.timeline__item.reveal.active .timeline__dot,
-.timeline__item.reveal.visible .timeline__dot{transform:scale(1);animation:dotPop 500ms cubic-bezier(.34,1.56,.64,1) backwards 200ms}
-
-/* Tech-chip children (triggered by parent .active) */
-.stack__row.reveal .tech-chip{opacity:0}
-.stack__row.reveal.active .tech-chip,
-.stack__row.reveal.visible .tech-chip{opacity:1;animation:chipReveal 500ms var(--ease) backwards}
-.stack__row.reveal.active .tech-chip:nth-child(1),.stack__row.reveal.visible .tech-chip:nth-child(1){animation-delay:50ms}
-.stack__row.reveal.active .tech-chip:nth-child(2),.stack__row.reveal.visible .tech-chip:nth-child(2){animation-delay:100ms}
-.stack__row.reveal.active .tech-chip:nth-child(3),.stack__row.reveal.visible .tech-chip:nth-child(3){animation-delay:150ms}
-.stack__row.reveal.active .tech-chip:nth-child(4),.stack__row.reveal.visible .tech-chip:nth-child(4){animation-delay:200ms}
-.stack__row.reveal.active .tech-chip:nth-child(5),.stack__row.reveal.visible .tech-chip:nth-child(5){animation-delay:250ms}
-.stack__row.reveal.active .tech-chip:nth-child(6),.stack__row.reveal.visible .tech-chip:nth-child(6){animation-delay:300ms}
-.stack__row.reveal.active .tech-chip:nth-child(7),.stack__row.reveal.visible .tech-chip:nth-child(7){animation-delay:350ms}
-
-/* Hero entrance (page-loaded based) */
-.hero__copy [data-i]{opacity:0}
-body.page-loaded .hero__copy [data-i]{
-  opacity:1;
-  animation:heroIn 600ms var(--ease) backwards;
-  animation-delay:calc(.1s + var(--i,0) * .1s);
+.timeline__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--bg-alt), 0 0 0 6px rgba(114, 87, 255, 0.2);
+  position: relative;
+  z-index: 2;
+  transform: scale(0);
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s;
 }
-/* Hero CTA button sequential */
-.hero__copy [data-i="3"] .btn{opacity:0}
-body.page-loaded .hero__copy [data-i="3"] .btn:first-child{opacity:1;animation:heroIn 500ms var(--ease) backwards;animation-delay:.5s}
-body.page-loaded .hero__copy [data-i="3"] .btn:last-child{opacity:1;animation:heroIn 500ms var(--ease) backwards;animation-delay:.65s}
+.timeline__item.active .timeline__dot,
+.timeline__item.visible .timeline__dot {
+  transform: scale(1);
+}
 
-/* Hero visual entrance */
-.hv > *{opacity:0;transition:opacity 500ms var(--ease)}
-body.page-loaded .hv > *,.hv.active > *{opacity:1}
-body.page-loaded .hv__card--code,.hv.active .hv__card--code{transition-delay:.3s}
-body.page-loaded .hv__info--1,.hv.active .hv__info--1{transition-delay:.5s}
-body.page-loaded .hv__info--2,.hv.active .hv__info--2{transition-delay:.65s}
-body.page-loaded .hv__info--3,.hv.active .hv__info--3{transition-delay:.8s}
-body.page-loaded .hv__blob--a,.hv.active .hv__blob--a{transition-delay:.1s}
-body.page-loaded .hv__blob--b,.hv.active .hv__blob--b{transition-delay:.2s}
-body.page-loaded .hv__ring,.hv.active .hv__ring{transition-delay:.4s}
-body.page-loaded .hv__circle--a,.hv.active .hv__circle--a{transition-delay:.5s}
-body.page-loaded .hv__circle--b,.hv.active .hv__circle--b{transition-delay:.6s}
-body.page-loaded .hv__dots,.hv.active .hv__dots{transition-delay:.7s}
+/* Tech-chips stagger */
+.stack__row .tech-chip {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.stack__row.active .tech-chip,
+.stack__row.visible .tech-chip {
+  opacity: 1;
+  transform: translateY(0);
+}
+.stack__row .tech-chip:nth-child(1) { transition-delay: 0.06s; }
+.stack__row .tech-chip:nth-child(2) { transition-delay: 0.12s; }
+.stack__row .tech-chip:nth-child(3) { transition-delay: 0.18s; }
+.stack__row .tech-chip:nth-child(4) { transition-delay: 0.24s; }
+.stack__row .tech-chip:nth-child(5) { transition-delay: 0.30s; }
+.stack__row .tech-chip:nth-child(6) { transition-delay: 0.36s; }
+.stack__row .tech-chip:nth-child(7) { transition-delay: 0.42s; }
 
-/* Navbar entrance */
-.nav{opacity:0;transform:translateY(-20px);transition:opacity 600ms var(--ease),transform 600ms var(--ease),background var(--dur) var(--ease),box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease)}
-body.page-loaded .nav{opacity:1;transform:translateY(0)}
+/* Prevent hover delay */
+.svc-card:hover, .proj-card:hover, .course-card:hover, .timeline__card:hover, .tech-chip:hover, .btn:hover {
+  transition-delay: 0s !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   HERO ENTRANCE ANIMATIONS (Auto on page load via Keyframes)
+   Runs automatically as soon as the page is opened!
+   Sequence:
+   1. Nav drops down (0.05s)
+   2. Badge appears (0.15s)
+   3. Heading slides up from 40px and fades in (0.30s)
+   4. Role appears (0.45s)
+   5. Description appears (0.60s)
+   6. Buttons appear (0.75s)
+   7. Social icons appear (0.90s)
+   8. Developer illustration appears (0.40s)
+   ═══════════════════════════════════════════════════ */
+
+@keyframes navDown {
+  from { opacity: 0; transform: translateY(-24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroBadgeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroHeadingIn {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroRoleIn {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroDescIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroActionsIn {
+  from { opacity: 0; transform: translateY(25px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroConnectIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroVisualIn {
+  from { opacity: 0; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.nav {
+  animation: navDown 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+}
+.hero__badge {
+  display: inline-block;
+  margin-bottom: 14px;
+  animation: heroBadgeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+.hero__title {
+  animation: heroHeadingIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both;
+}
+.hero__role {
+  animation: heroRoleIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.45s both;
+}
+.hero__desc {
+  animation: heroDescIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.60s both;
+}
+.hero__actions {
+  animation: heroActionsIn 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.75s both;
+}
+.hero__connect {
+  animation: heroConnectIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.90s both;
+}
+.hv {
+  animation: heroVisualIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.40s both;
+}
 
 /* Continuous animations */
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
@@ -859,21 +992,12 @@ body.page-loaded .nav{opacity:1;transform:translateY(0)}
 /* ═══════════════════════════════════════════════════
    REDUCED MOTION
    ═══════════════════════════════════════════════════ */
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    animation-duration:.01ms!important;
-    animation-iteration-count:1!important;
-    transition-duration:.01ms!important;
-  }
-  .reveal,.reveal--left,.reveal--right,
-  .stack__row.reveal .tech-chip,
-  .hero__copy [data-i],
-  .hero__copy [data-i="3"] .btn,
-  .hv > *,.nav{
-    opacity:1!important;
-    transform:none!important;
-  }
-  html{scroll-behavior:auto}
+@media (prefers-reduced-motion: reduce) {
+  /* Only tone down continuous infinite animations to avoid dizziness,
+     while preserving smooth entrance transitions for portfolio demonstration */
+  .hero__cursor { animation: none; }
+  .hv__blob--a, .hv__blob--b { animation: none; }
+  html { scroll-behavior: auto; }
 }
 
 /* Print */
