@@ -1,0 +1,19 @@
+{
+  "name": "portofolio",
+  "version": "1.0.0",
+  "description": "Muhammad Aditya Kurniawan — Fullstack Developer Portfolio",
+  "main": "index.html",
+  "scripts": {
+    "start": "node -e \"const http = require('http'), fs = require('fs'); http.createServer((req, res) => { let p = req.url === '/' ? '/index.html' : req.url; try { res.end(fs.readFileSync('.' + p)); } catch(e) { res.statusCode = 404; res.end('Not found'); } }).listen(3000, () => console.log('Dev server running on http://localhost:3000'));\""
+  },
+  "dependencies": {
+    "framer-motion": "^11.11.17",
+    "motion": "^11.11.17"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AcelInv/Portofolio.git"
+  },
+  "author": "Muhammad Aditya Kurniawan",
+  "license": "ISC"
+}
