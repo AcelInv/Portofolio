@@ -12,7 +12,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=20261031_04">
+  <link rel="stylesheet" href="styles.css?v=20261031_05">
   <script>document.documentElement.classList.add('js');</script>
 </head>
 
@@ -29,9 +29,11 @@
         <a class="nav__link" href="#home">Home</a>
         <a class="nav__link" href="#about">About</a>
         <a class="nav__link" href="#journey">Experience</a>
+        <a class="nav__link" href="#skills">Skills</a>
+        <a class="nav__link" href="#services">Services</a>
         <a class="nav__link" href="#projects">Projects</a>
         <a class="nav__link" href="#coursework">Coursework</a>
-        <a class="nav__link" href="#contact">Contacts</a>
+        <a class="nav__link" href="#contact">Contact</a>
       </div>
       <button class="nav__hamburger" id="navToggle" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -45,9 +47,11 @@
       <a class="mob-menu__link" href="#home">Home</a>
       <a class="mob-menu__link" href="#about">About</a>
       <a class="mob-menu__link" href="#journey">Experience</a>
+      <a class="mob-menu__link" href="#skills">Skills</a>
+      <a class="mob-menu__link" href="#services">Services</a>
       <a class="mob-menu__link" href="#projects">Projects</a>
       <a class="mob-menu__link" href="#coursework">Coursework</a>
-      <a class="mob-menu__link" href="#contact">Contacts</a>
+      <a class="mob-menu__link" href="#contact">Contact</a>
     </div>
   </div>
 
@@ -313,9 +317,10 @@
     </section>
 
     <!-- ════════════════════════════════════════
-         MY TECH STACK
+         MY TECH STACK (SKILLS)
          ════════════════════════════════════════ -->
-    <section class="section" id="tech-stack">
+    <section class="section" id="skills">
+      <span id="tech-stack" style="position:relative;top:-80px;display:block;" aria-hidden="true"></span>
       <div class="container">
         <div class="sec-head reveal">
           <span class="eyebrow">SKILLS &amp; TOOLS</span>
@@ -794,6 +799,8 @@
           <a href="#home">Home</a>
           <a href="#about">About</a>
           <a href="#journey">Experience</a>
+          <a href="#skills">Skills</a>
+          <a href="#services">Services</a>
           <a href="#projects">Projects</a>
           <a href="#coursework">Coursework</a>
           <a href="#contact">Contact</a>
@@ -941,16 +948,120 @@
           mob.setAttribute('aria-hidden', !open);
           document.body.style.overflow = open ? 'hidden' : '';
         });
-        mob.querySelectorAll('a').forEach(function (a) {
-          a.addEventListener('click', function () {
-            mob.classList.remove('open');
-            tog.classList.remove('open');
-            tog.setAttribute('aria-expanded', 'false');
-            mob.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-          });
-        });
       }
+
+      /* ── Fluid Smooth Scrolling with Ease-in-Out Acceleration ──── */
+      var currentScrollAnimation = null;
+
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function getScrollOffset() {
+        var header = document.getElementById('header');
+        return header ? header.offsetHeight + 18 : 76;
+      }
+
+      function smoothScrollTo(destinationY, callback) {
+        if (currentScrollAnimation) {
+          cancelAnimationFrame(currentScrollAnimation);
+          currentScrollAnimation = null;
+        }
+
+        var startY = window.pageYOffset || document.documentElement.scrollTop;
+        var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var clampedDestination = Math.max(0, Math.min(destinationY, maxScroll));
+        var distance = clampedDestination - startY;
+
+        if (Math.abs(distance) < 4) {
+          window.scrollTo(0, clampedDestination);
+          if (callback) callback();
+          return;
+        }
+
+        // Distance-based duration: between 650ms (nearby) and 1150ms (far)
+        var duration = Math.min(1150, Math.max(650, Math.round(Math.abs(distance) * 0.4)));
+        var startTime = null;
+
+        function cancelOnUserInteraction() {
+          if (currentScrollAnimation) {
+            cancelAnimationFrame(currentScrollAnimation);
+            currentScrollAnimation = null;
+          }
+          removeListeners();
+        }
+
+        function removeListeners() {
+          window.removeEventListener('wheel', cancelOnUserInteraction);
+          window.removeEventListener('touchstart', cancelOnUserInteraction);
+          window.removeEventListener('keydown', onKey);
+        }
+
+        function onKey(e) {
+          if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].indexOf(e.key) !== -1) {
+            cancelOnUserInteraction();
+          }
+        }
+
+        window.addEventListener('wheel', cancelOnUserInteraction, { passive: true });
+        window.addEventListener('touchstart', cancelOnUserInteraction, { passive: true });
+        window.addEventListener('keydown', onKey, { passive: true });
+
+        function step(timestamp) {
+          if (!startTime) startTime = timestamp;
+          var elapsed = timestamp - startTime;
+          var progress = Math.min(elapsed / duration, 1);
+          var easedProgress = easeInOutCubic(progress);
+
+          window.scrollTo(0, Math.round(startY + distance * easedProgress));
+
+          if (progress < 1) {
+            currentScrollAnimation = requestAnimationFrame(step);
+          } else {
+            currentScrollAnimation = null;
+            removeListeners();
+            if (callback) callback();
+          }
+        }
+
+        currentScrollAnimation = requestAnimationFrame(step);
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+        anchor.addEventListener('click', function (e) {
+          var targetId = this.getAttribute('href');
+          if (!targetId || targetId === '#') return;
+          var targetEl = document.querySelector(targetId);
+          if (targetEl) {
+            e.preventDefault();
+            var offset = getScrollOffset();
+            var targetY = targetEl.getBoundingClientRect().top + window.pageYOffset - offset;
+
+            // Immediately set active indicator
+            links.forEach(function (l) { l.classList.remove('active'); });
+            var clickedNavLink = document.querySelector('.nav__link[href="' + targetId + '"]');
+            if (clickedNavLink) clickedNavLink.classList.add('active');
+
+            // Close mobile menu if open
+            if (mob && mob.classList.contains('open')) {
+              mob.classList.remove('open');
+              if (tog) {
+                tog.classList.remove('open');
+                tog.setAttribute('aria-expanded', 'false');
+              }
+              mob.setAttribute('aria-hidden', 'true');
+              document.body.style.overflow = '';
+            }
+
+            // Fluid smooth scroll to target
+            smoothScrollTo(targetY, function () {
+              if (history.pushState) {
+                history.pushState(null, null, targetId);
+              }
+            });
+          }
+        });
+      });
 
       /* ── Dynamic Typewriter ─────────────────── */
       var twEl = document.getElementById('typewriter');
